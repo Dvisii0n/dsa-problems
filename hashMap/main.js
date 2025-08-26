@@ -4,8 +4,10 @@ const hashMap = new HashMap();
 
 hashMap.set("Rama", "this");
 
-hashMap.set("Sita", "this");
+hashMap.set("Sita", "that");
 
-hashMap.set("Habibi", "this");
+hashMap.set("Sita", "new val");
+
+hashMap.set("Habibi", "hamood");
 
 console.log(hashMap.buckets);

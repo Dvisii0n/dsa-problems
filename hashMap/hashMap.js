@@ -23,16 +23,16 @@ export default class HashMap {
     set(key, value) {
         const hashCode = this.hash(key);
 
-        const bucketList = this.buckets[hashCode];
+        const selectedBucket = this.buckets[hashCode];
 
-        if (!bucketList) {
+        if (!selectedBucket) {
             this.buckets[hashCode] = new LinkedList();
             const linkedList = this.buckets[hashCode];
             linkedList.append([key, value]);
         } else {
             this.#replaceOrAppendValue(
-                bucketList,
-                bucketList.head(),
+                selectedBucket,
+                selectedBucket.head(),
                 key,
                 value
             );
@@ -53,5 +53,45 @@ export default class HashMap {
         return this.#replaceOrAppendValue(list, node.nextNode, key, value);
     }
 
-    get(key) {}
+    get(key) {
+        const hashCode = this.hash(key);
+        const selectedBucket = this.buckets[hashCode];
+        if (selectedBucket) {
+            return this.#getValueFromKey(selectedBucket.head(), key);
+        }
+
+        return selectedBucket;
+    }
+
+    #getValueFromKey(node, key) {
+        if (!node) {
+            return null;
+        }
+
+        const storedKey = node.value[0];
+        const storedValue = node.value[1];
+
+        if (key === storedKey) {
+            return storedValue;
+        }
+
+        if (!node.nextNode) {
+            return null;
+        }
+
+        return this.#getValueFromKey(node.nextNode, key);
+    }
+
+    has(key) {
+        const hashCode = this.hash(key);
+        const selectedBucket = this.buckets[hashCode];
+
+        if (selectedBucket) {
+            return this.#getValueFromKey(selectedBucket.head(), key)
+                ? true
+                : false;
+        }
+
+        return false;
+    }
 }
