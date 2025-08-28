@@ -6,8 +6,10 @@ hashMap.set("Rama", "this");
 
 hashMap.set("Sita", "that");
 
-hashMap.set("Sita", "new val");
-
 hashMap.set("Habibi", "hamood");
 
-console.log(hashMap.buckets);
+hashMap.set("Hamood", "habibi");
+
+console.log(hashMap.values());
+
+// console.log(hashMap.buckets);
