@@ -3,8 +3,40 @@ import LinkedList from "../linkedList/linkedList.js";
 export default class HashMap {
     constructor() {
         this.loadFactor = 0.75;
-        this.capacity = 16;
-        this.buckets = Array.from({ length: this.capacity }, (v, k) => null);
+        this.initialCapacity = 16;
+        this.buckets = Array.from(
+            { length: this.initialCapacity },
+            (v, k) => null
+        );
+    }
+
+    getCapacity() {
+        return this.buckets.length;
+    }
+
+    #grow() {
+        const entries = this.entries();
+
+        this.buckets = Array.from(
+            { length: this.getCapacity() * 2 },
+            (v, k) => null
+        );
+
+        entries.forEach((entry) => {
+            const key = entry[0];
+            const value = entry[1];
+
+            this.set(key, value);
+        });
+    }
+
+    #checkLoadFactor() {
+        const capacity = this.getCapacity();
+        const growFactor = Math.ceil(capacity * this.loadFactor);
+
+        if (this.length() > growFactor) {
+            this.#grow();
+        }
     }
 
     hash(key) {
@@ -28,6 +60,7 @@ export default class HashMap {
     set(key, value) {
         const hashCode = this.hash(key);
         const selectedBucket = this.buckets[hashCode];
+
         if (!selectedBucket) {
             this.buckets[hashCode] = new LinkedList();
             const linkedList = this.buckets[hashCode];
@@ -40,6 +73,7 @@ export default class HashMap {
                 value
             );
         }
+        this.#checkLoadFactor();
     }
 
     #replaceOrAppendValue(list, node, key, value) {
@@ -139,7 +173,10 @@ export default class HashMap {
     }
 
     clear() {
-        this.buckets = Array.from({ length: this.capacity }, (v, k) => null);
+        this.buckets = Array.from(
+            { length: this.initialCapacity },
+            (v, k) => null
+        );
     }
 
     #getKeys(node) {
@@ -181,6 +218,28 @@ export default class HashMap {
         for (let bucket of this.buckets) {
             if (bucket) {
                 arr.push(...this.#getValues(bucket.head()));
+            }
+        }
+        return arr;
+    }
+
+    #getKeyValPair(node) {
+        const arr = [];
+        if (!node) {
+            return arr;
+        }
+
+        const keyValPair = node.value;
+        arr.push(keyValPair);
+
+        return arr.concat(this.#getKeyValPair(node.nextNode));
+    }
+
+    entries() {
+        let arr = [];
+        for (let bucket of this.buckets) {
+            if (bucket) {
+                arr.push(...this.#getKeyValPair(bucket.head()));
             }
         }
         return arr;
