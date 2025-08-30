@@ -44,12 +44,10 @@ export default class HashMap {
 
         const primeNumber = 31;
         for (let i = 0; i < key.length; i++) {
-            hashcode =
-                (primeNumber * hashcode + key.charCodeAt(i)) %
-                this.buckets.length;
+            hashcode = primeNumber * hashcode + key.charCodeAt(i);
         }
 
-        return hashcode;
+        return Math.abs(hashcode) % this.buckets.length;
     }
 
     #getBucket(key) {
@@ -131,17 +129,13 @@ export default class HashMap {
     }
 
     #getNodeWithKey(node, key) {
-        if (!node) {
-            return null;
-        }
-
         const storedKey = node.value[0];
 
         if (key === storedKey) {
             return node;
         }
 
-        if (!node.nextNode) {
+        if (!node) {
             return null;
         }
 
@@ -150,6 +144,8 @@ export default class HashMap {
 
     remove(key) {
         const selectedBucket = this.#getBucket(key);
+
+        if (!selectedBucket) return false;
 
         const node = this.#getNodeWithKey(selectedBucket.head(), key);
 

@@ -33,6 +33,8 @@ test.set("moon", "0");
 console.log(test.get("lion"));
 console.log(test.has("lion"));
 
+console.log(test.remove("yo yo mr white"));
+
 console.log(test.entries());
 
 console.log(test.length());
