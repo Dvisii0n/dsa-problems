@@ -23,7 +23,7 @@ function buildTree(arr) {
     const root = new Node(arr[mid]);
 
     root.left = buildTree(arr.slice(0, mid));
-    root.right = buildTree(arr.slice(mid + 1, arr.length));
+    root.right = buildTree(arr.slice(mid + 1));
 
     return root;
 }
