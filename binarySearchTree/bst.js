@@ -47,7 +47,53 @@ class Tree {
         this.root = buildTree(arr);
     }
 
-    insert(value) {}
+    #insertRec(newNode, node) {
+        if (newNode.data <= node.data) {
+            if (!node.left) {
+                return (node.left = newNode);
+            } else {
+                return this.#insertRec(newNode, node.left);
+            }
+        }
+
+        if (!node.right) {
+            return (node.right = newNode);
+        }
+        return this.#insertRec(newNode, node.right);
+    }
+
+    insert(value) {
+        const newNode = new Node(value);
+        return this.#insertRec(newNode, this.root);
+    }
+
+    #deleteChild(value, node) {
+        if (node === null) {
+            return node;
+        }
+
+        if (value < node.data) {
+            node.left = this.#deleteChild(value, node.left);
+        } else if (value > node.data) {
+            node.right = this.#deleteChild(value, node.right);
+        } else {
+            if (node.left === null) {
+                return node.right;
+            }
+
+            if (node.right === null) {
+                return node.left;
+            }
+
+            //inorder function for nodes with both childs
+        }
+
+        return node;
+    }
+
+    delete(value) {
+        return this.#deleteChild(value, this.root);
+    }
 }
 
 const arr = sortAndRemoveDuplicates([
@@ -55,5 +101,7 @@ const arr = sortAndRemoveDuplicates([
 ]);
 
 const tree = new Tree(arr);
+
+tree.delete(1);
 
 prettyPrint(tree.root);
