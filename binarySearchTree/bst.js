@@ -67,15 +67,23 @@ class Tree {
         return this.#insertRec(newNode, this.root);
     }
 
-    #deleteChild(value, node) {
+    #getSuccesor(node) {
+        node = node.right;
+        while (node !== null && node.left !== null) {
+            node = node.left;
+        }
+        return node;
+    }
+
+    #deleteNode(value, node) {
         if (node === null) {
             return node;
         }
 
         if (value < node.data) {
-            node.left = this.#deleteChild(value, node.left);
+            node.left = this.#deleteNode(value, node.left);
         } else if (value > node.data) {
-            node.right = this.#deleteChild(value, node.right);
+            node.right = this.#deleteNode(value, node.right);
         } else {
             if (node.left === null) {
                 return node.right;
@@ -85,14 +93,66 @@ class Tree {
                 return node.left;
             }
 
-            //inorder function for nodes with both childs
+            const succesor = this.#getSuccesor(node);
+            node.data = succesor.data;
+            node.right = this.#deleteNode(succesor.data, node.right);
         }
 
         return node;
     }
 
     delete(value) {
-        return this.#deleteChild(value, this.root);
+        return this.#deleteNode(value, this.root);
+    }
+
+    #findRec(value, node) {
+        if (node === null) {
+            return node;
+        }
+
+        if (value < node.data) {
+            return this.#findRec(value, node.left);
+        }
+
+        if (value > node.data) {
+            return this.#findRec(value, node.right);
+        }
+
+        return node;
+    }
+
+    find(value) {
+        return this.#findRec(value, this.root);
+    }
+
+    #traverse(node, queue, callback) {
+        try {
+            if (queue.length === 0) {
+                return;
+            }
+
+            if (node.left !== null) {
+                queue.push(node.left);
+            }
+
+            if (node.right !== null) {
+                queue.push(node.right);
+            }
+
+            callback(node);
+            queue.shift();
+
+            return this.#traverse(queue[0], queue, callback);
+        } catch (error) {
+            throw "ERROR: Callback function not provided";
+        }
+    }
+
+    levelOrderForEach(callback) {
+        let queue = [];
+        queue.push(this.root);
+
+        return this.#traverse(this.root, queue, callback);
     }
 }
 
@@ -102,6 +162,8 @@ const arr = sortAndRemoveDuplicates([
 
 const tree = new Tree(arr);
 
-tree.delete(1);
-
 prettyPrint(tree.root);
+
+tree.levelOrderForEach((node) => {
+    console.log(node.data);
+});
