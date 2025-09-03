@@ -44,11 +44,11 @@ class Node {
 
 class Tree {
     constructor(arr) {
-        this.root = buildTree(arr);
+        this.root = buildTree(sortAndRemoveDuplicates(arr));
     }
 
     #insertRec(newNode, node) {
-        if (newNode.data <= node.data) {
+        if (newNode.data < node.data) {
             if (!node.left) {
                 return (node.left = newNode);
             } else {
@@ -102,7 +102,8 @@ class Tree {
     }
 
     delete(value) {
-        return this.#deleteNode(value, this.root);
+        this.root = this.#deleteNode(value, this.root);
+        return this.root;
     }
 
     #findRec(value, node) {
@@ -125,7 +126,7 @@ class Tree {
         return this.#findRec(value, this.root);
     }
 
-    #traverse(node, queue, callback) {
+    levelOrderTraversal(node, queue, callback) {
         try {
             if (queue.length === 0) {
                 return;
@@ -142,7 +143,7 @@ class Tree {
             callback(node);
             queue.shift();
 
-            return this.#traverse(queue[0], queue, callback);
+            return this.levelOrderTraversal(queue[0], queue, callback);
         } catch (error) {
             throw "ERROR: Callback function not provided";
         }
@@ -152,18 +153,114 @@ class Tree {
         let queue = [];
         queue.push(this.root);
 
-        return this.#traverse(this.root, queue, callback);
+        return this.levelOrderTraversal(this.root, queue, callback);
+    }
+
+    #inOrderTraversal(node, callback) {
+        if (node === null) {
+            return node;
+        }
+
+        this.#inOrderTraversal(node.left, callback);
+        callback(node);
+        this.#inOrderTraversal(node.right, callback);
+    }
+
+    #preOrderTraversal(node, callback) {
+        if (node === null) {
+            return node;
+        }
+
+        callback(node);
+        this.#preOrderTraversal(node.left, callback);
+        this.#preOrderTraversal(node.right, callback);
+    }
+
+    #postOrderTraversal(node, callback) {
+        if (node === null) {
+            return node;
+        }
+
+        this.#postOrderTraversal(node.left, callback);
+        this.#postOrderTraversal(node.right, callback);
+        callback(node);
+    }
+
+    inOrderForEach(callback) {
+        return this.#inOrderTraversal(this.root, callback);
+    }
+
+    preOrderForEach(callback) {
+        return this.#preOrderTraversal(this.root, callback);
+    }
+
+    postOrderForEach(callback) {
+        return this.#postOrderTraversal(this.root, callback);
+    }
+
+    #getHeight(node) {
+        if (node === null) {
+            return -1;
+        }
+
+        return (
+            Math.max(this.#getHeight(node.left), this.#getHeight(node.right)) +
+            1
+        );
+    }
+
+    height(value) {
+        const node = this.find(value);
+        return node ? this.#getHeight(node) : null;
+    }
+
+    depth(value) {
+        const rootHeight = this.#getHeight(this.root);
+
+        const valueHeight = this.height(value);
+
+        if (valueHeight === null) {
+            return null;
+        }
+
+        return rootHeight - valueHeight;
+    }
+
+    isBalanced() {
+        let treeIsBalanced = true;
+
+        this.inOrderForEach((node) => {
+            const leftHeight = this.#getHeight(node.left);
+            const rightHeight = this.#getHeight(node.right);
+
+            const balanced =
+                Math.max(leftHeight, rightHeight) -
+                    Math.min(leftHeight, rightHeight) <=
+                1;
+
+            if (!balanced) {
+                treeIsBalanced = false;
+            }
+        });
+
+        return treeIsBalanced;
+    }
+
+    rebalance() {
+        let arr = [];
+        this.inOrderForEach((node) => {
+            arr.push(node.data);
+        });
+
+        this.root = buildTree(arr);
+        return true;
     }
 }
 
-const arr = sortAndRemoveDuplicates([
-    1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324,
-]);
-
-const tree = new Tree(arr);
+const tree = new Tree([1, 2, 3, 4]);
 
 prettyPrint(tree.root);
 
-tree.levelOrderForEach((node) => {
-    console.log(node.data);
-});
+console.log(tree.find(1));
+
+export { prettyPrint, Tree };
