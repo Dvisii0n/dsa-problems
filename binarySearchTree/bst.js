@@ -257,10 +257,4 @@ class Tree {
     }
 }
 
-const tree = new Tree([1, 2, 3, 4]);
-
-prettyPrint(tree.root);
-
-console.log(tree.find(1));
-
 export { prettyPrint, Tree };
