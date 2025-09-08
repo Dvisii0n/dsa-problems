@@ -5,7 +5,12 @@ function inRange(x, min, max) {
 function knightMoves(start, end) {
     const min = 0;
     const max = 7;
-    if (!inRange(start[0], min, max) || !inRange(end[0], min, max)) {
+    if (
+        !inRange(start[0], min, max) ||
+        !inRange(end[0], min, max) ||
+        !inRange(start[1], min, max) ||
+        !inRange(end[1], min, max)
+    ) {
         throw "ERROR: Invalid postion, values must be from 0 to 7";
     }
 
