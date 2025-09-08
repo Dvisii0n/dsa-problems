@@ -26,18 +26,21 @@ function knightMoves(start, end) {
     ];
 
     const queue = [];
+    const visited = new Set();
 
     const rootNode = { value: start, parent: null };
 
     queue.push(rootNode);
 
     const enqueueMoves = (start, end, queue) => {
-        console.log(queue);
+        console.log(queue[0].value);
         if (queue[0].value.toString() === end.toString()) {
             return queue[0];
         }
 
-        queue.shift();
+        const first = queue.shift();
+
+        visited.add(first.value.toString());
 
         for (let move of moves) {
             const validMove = [
@@ -46,7 +49,11 @@ function knightMoves(start, end) {
             ];
             const x = validMove[0];
             const y = validMove[1];
-            if (inRange(x, min, max) && inRange(y, min, max)) {
+            if (
+                inRange(x, min, max) &&
+                inRange(y, min, max) &&
+                !visited.has(validMove.toString())
+            ) {
                 queue.push({ value: validMove, parent: start });
             }
         }
@@ -89,6 +96,8 @@ function knightMoves(start, end) {
     reversedPath.forEach((node) => {
         console.log(node);
     });
+
+    console.log(visited);
 
     return;
 }
